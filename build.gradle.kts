@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "fr.formiko.biomeutils"
-version = "1.0.6"
+version = "1.0.8"
 description="Tools for Minecraft plugins about biomes."
 
 repositories {
