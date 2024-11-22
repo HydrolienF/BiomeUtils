@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "fr.formiko.biomeutils"
-version = "1.0.5"
+version = "1.0.6"
 description="Tools for Minecraft plugins about biomes."
 
 repositories {
@@ -26,10 +26,13 @@ java {
 }
 
 publishing {
-    publications.create<MavenPublication>("maven") {
-        from(components["java"])
+    publications {
+        create<MavenPublication>("maven") {
+		    from(components["java"])
+        }
     }
 }
+
 tasks.jar {
     archiveFileName.set("${project.name}-${project.version}.jar")
 }
