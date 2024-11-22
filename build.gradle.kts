@@ -1,11 +1,11 @@
 plugins {
     `java-library`
-    id("io.papermc.paperweight.userdev") version "1.7.1" // paperweight // Check for new versions at https://plugins.gradle.org/plugin/io.papermc.paperweight.userdev
+    id("io.papermc.paperweight.userdev") version "1.7.3" // paperweight // Check for new versions at https://plugins.gradle.org/plugin/io.papermc.paperweight.userdev
     `maven-publish` // Add ./gradlew publishToMavenLocal
 }
 
 group = "fr.formiko.biomeutils"
-version = "1.0.3"
+version = "1.0.5"
 description="Tools for Minecraft plugins about biomes."
 
 repositories {
