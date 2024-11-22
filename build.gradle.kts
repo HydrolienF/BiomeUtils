@@ -1,17 +1,17 @@
 plugins {
     `java-library`
+    id("io.github.goooler.shadow") version "8.1.7"
     id("io.papermc.paperweight.userdev") version "1.7.3" // paperweight // Check for new versions at https://plugins.gradle.org/plugin/io.papermc.paperweight.userdev
     `maven-publish` // Add ./gradlew publishToMavenLocal
 }
 
 group = "fr.formiko.biomeutils"
-version = "1.0.8"
+version = "1.0.28"
 description="Tools for Minecraft plugins about biomes."
 
 repositories {
     mavenLocal()
     mavenCentral()
-    maven ("https://repo.papermc.io/repository/maven-public/")
     maven ("https://jitpack.io")
 }
 
@@ -29,10 +29,24 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
 		    from(components["java"])
+            artifactId = project.name.lowercase()
+            // artifact shadowJar
         }
     }
 }
 
-tasks.jar {
-    archiveFileName.set("${project.name}-${project.version}.jar")
+tasks {
+    shadowJar {
+        // val prefix = "${project.group}.lib"
+        // sequenceOf(
+        // ).forEach { pkg ->
+        //     relocate(pkg, "$prefix.$pkg")
+        // }
+        archiveFileName.set("${project.name}-${project.version}.jar")
+    }
+
+    assemble {
+        // dependsOn(shadowJar) // Not needed, probably because reobfJar depends on shadowJar
+        dependsOn(reobfJar)
+    }
 }
