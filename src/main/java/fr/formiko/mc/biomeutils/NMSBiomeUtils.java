@@ -1,4 +1,4 @@
-package fr.formiko.biomeutils;
+package fr.formiko.mc.biomeutils;
 
 import java.util.Map;
 import java.util.stream.Collectors;
