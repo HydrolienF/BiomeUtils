@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "fr.formiko.mc.biomeutils"
-version = "1.1.7"
+version = "1.1.8"
 description="Tools for Minecraft plugins about biomes."
 // name = "BiomeUtils"
 
@@ -20,7 +20,7 @@ repositories {
 
 
 dependencies {
-    paperweight.paperDevBundle("1.21.3-R0.1-SNAPSHOT") // paperweight
+    paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT") // paperweight
 }
 
 java {
@@ -31,13 +31,7 @@ java {
 }
 
 tasks {
-    assemble {
-        // dependsOn(shadowJar) // Not needed, probably because reobfJar depends on shadowJar
-        // dependsOn(reobfJar)
-    }
-    publish {
-        // dependsOn(reobfJar)
-    }
+  // Don't make assemble or publish depend on reobfJar We don't want to reobfuscate the jar here. It will be done later by the plugin using this dependency.
     jar {
       manifest {
         attributes["paperweight-mappings-namespace"] = "mojang"
@@ -50,18 +44,6 @@ afterEvaluate {
         dependsOn(tasks.assemble)
     }
 }
-
-// fun addReobfTo(target: NamedDomainObjectProvider<Configuration>, classifier: String? = null) {
-//     target.get().let {
-//         it.outgoing.artifact(tasks.reobfJar.get().outputJar) {
-//             this.classifier = classifier
-//         }
-//         (components["java"] as AdhocComponentWithVariants).addVariantsFromConfiguration(it) {}
-//     }
-// }
-
-// addReobfTo(configurations.apiElements)
-// addReobfTo(configurations.runtimeElements)
 
 publishing {
   publications {

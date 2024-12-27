@@ -1,5 +1,6 @@
 package fr.formiko.mc.biomeutils;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,6 +24,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkAccess;
 
+/**
+ * Tool class to manipulate nms biomes.
+ * Unless the function name specifies it the objects are Minecraft objects and not Bukkit objects.
+ */
 public class NMSBiomeUtils {
     // Key, Biome
     private static Map<String, Biome> allBiomes;
@@ -34,7 +39,7 @@ public class NMSBiomeUtils {
 
     /** Return the biome from it's key */
     @Nullable
-    public static Biome getBiome(String key) {
+    public static Biome getBiome(@Nonnull String key) {
         Holder.Reference<Biome> ref = getBiomeRegistry().get(resourceLocation(key)).orElse(null);
         if (ref == null)
             return null;
@@ -43,43 +48,37 @@ public class NMSBiomeUtils {
     /**
      * Return the real biome at the given location. (Not the noise biome)
      */
-    @Nullable
-    public static Biome getBiome(Location location) {
+    @Nonnull
+    public static Biome getBiome(@Nonnull Location location) {
         return getBiome(location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld());
     }
-    @Nullable
-    public static Holder<Biome> getBiomeHolder(Location location) {
+    @Nonnull
+    public static Holder<Biome> getBiomeHolder(@Nonnull Location location) {
         return getBiomeHolder(location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld());
     }
 
     /**
      * Return the real biome at the given location. (Not the noise biome)
      */
-    @Nullable
+    @Nonnull
     public static Biome getBiome(int x, int y, int z, World bukkitWorld) {
         Holder<Biome> biomeHolder = getBiomeHolder(x, y, z, bukkitWorld);
         return biomeHolder == null ? null : biomeHolder.value();
     }
-    @Nullable
-    public static Holder<Biome> getBiomeHolder(int x, int y, int z, World bukkitWorld) {
-        if (bukkitWorld == null)
-            return null;
+    @Nonnull
+    public static Holder<Biome> getBiomeHolder(int x, int y, int z, @Nonnull World bukkitWorld) {
         ServerLevel nmsWorld = ((CraftWorld) bukkitWorld).getHandle();
         return nmsWorld.getNoiseBiome(x >> 2, y >> 2, z >> 2);
     }
 
     @Nullable
-    public static ResourceLocation getBiomeKey(Location location) {
+    public static ResourceLocation getBiomeKey(@Nonnull Location location) {
         Biome biome = getBiome(location);
-        if (biome == null)
-            return null;
         return getBiomeRegistry().getKey(biome);
     }
     @Nullable
-    public static ResourceLocation getBiomeKey(int x, int y, int z, World bukkitWorld) {
+    public static ResourceLocation getBiomeKey(int x, int y, int z, @Nonnull World bukkitWorld) {
         Biome biome = getBiome(x, y, z, bukkitWorld);
-        if (biome == null)
-            return null;
         return getBiomeRegistry().getKey(biome);
     }
     @Nullable
@@ -92,6 +91,7 @@ public class NMSBiomeUtils {
         ResourceLocation key = getBiomeKey(x, y, z, bukkitWorld);
         return key == null ? null : key.toString();
     }
+    @Nonnull
     public static ResourceLocation resourceLocation(@Nonnull String name) {
         String[] t = name.split(":");
         return ResourceLocation.fromNamespaceAndPath(t[0], t[1]);
@@ -101,9 +101,7 @@ public class NMSBiomeUtils {
     // minecraft to bukkit don't work with custom biomes.
     public static org.bukkit.block.Biome minecraftToBukkit(Biome minecraft) { return CraftBiome.minecraftToBukkit(minecraft); }
     public static Biome bukkitToMinecraft(org.bukkit.block.Biome bukkit) { return CraftBiome.bukkitToMinecraft(bukkit); }
-    public static org.bukkit.block.Biome minecraftHolderToBukkit(Holder<Biome> minecraft) {
-        return CraftBiome.minecraftToBukkit(minecraft.value());
-    }
+    public static org.bukkit.block.Biome minecraftHolderToBukkit(Holder<Biome> minecraft) { return minecraftToBukkit(minecraft.value()); }
     public static Holder<Biome> bukkitToMinecraftHolder(org.bukkit.block.Biome bukkit) {
         return CraftBiome.bukkitToMinecraftHolder(bukkit);
     }
@@ -139,7 +137,7 @@ public class NMSBiomeUtils {
         Biome biome = getBiome(key);
         if (biome == null)
             return null;
-        return getBiomeRegistry().getResourceKey(biome).get();
+        return getBiomeRegistry().getResourceKey(biome).orElse(null);
     }
     @Nullable
     public static Holder<Biome> getBiomeHolder(String key) { return getBiomeRegistry().get(resourceLocation(key)).orElse(null); }
@@ -178,6 +176,13 @@ public class NMSBiomeUtils {
             chunk.getWorld().refreshChunk(chunk.getX(), chunk.getZ());
         }
     }
+    /**
+     * Set a full chunk to a custom biome.
+     * It refresh the chunk after setting the biome.
+     *
+     * @param newBiomeName the name of the custom biome to set (such as tardis:skaro_lakes)
+     * @param chunk        the chunk to set the biome for
+     */
     public static void setCustomBiome(String newBiomeName, Chunk chunk) { setCustomBiome(newBiomeName, chunk, true); }
 
     /**
@@ -195,12 +200,21 @@ public class NMSBiomeUtils {
             location.getWorld().refreshChunk(location.getChunk().getX(), location.getChunk().getZ());
         }
     }
+    /**
+     * Set a location to a custom biome
+     * It refresh the chunk after setting the biome.
+     *
+     * @param newBiomeName the name of the custom biome to set (such as tardis:skaro_lakes)
+     * @param location     the location to set the biome for
+     * @param refresh      whether to refresh the chunk after setting the biome
+     */
     public static void setCustomBiome(String newBiomeName, Location location) { setCustomBiome(newBiomeName, location, true); }
-    /** This function assumes the world is "world" */
-    public static void setCustomBiome(String newBiomeName, int x, int y, int z, boolean refresh) {
-        setCustomBiome(newBiomeName, new Location(Bukkit.getWorld("world"), x, y, z), refresh);
+    public static void setCustomBiome(String newBiomeName, int x, int y, int z, World world, boolean refresh) {
+        setCustomBiome(newBiomeName, new Location(world, x, y, z), refresh);
     }
-    public static void setCustomBiome(String newBiomeName, int x, int y, int z) { setCustomBiome(newBiomeName, x, y, z, true); }
+    public static void setCustomBiome(String newBiomeName, int x, int y, int z, World world) {
+        setCustomBiome(newBiomeName, x, y, z, world, true);
+    }
 
     private static void setCustomBiome(int x, int y, int z, Level w, Holder<Biome> bb) {
         BlockPos pos = new BlockPos(x, 0, z);
@@ -210,5 +224,24 @@ public class NMSBiomeUtils {
                 chunk.setBiome(x >> 2, y >> 2, z >> 2, bb);
             }
         }
+    }
+
+    public static @Nullable org.bukkit.block.Biome getBukkitBiome(String name) {
+        try {
+            return org.bukkit.block.Biome.valueOf(name.split(":")[1].toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    public static @Nonnull String normalizeBiomeName(@Nonnull String name) {
+        name = name.toLowerCase();
+        if (!name.contains(":")) {
+            name = "minecraft:" + name;
+        }
+        return name;
+    }
+    public static @Nonnull List<String> normalizeBiomeNameList(@Nonnull List<String> nameList) {
+        return nameList.stream().map(NMSBiomeUtils::normalizeBiomeName).toList();
     }
 }
