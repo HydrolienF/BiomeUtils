@@ -206,12 +206,31 @@ public class NMSBiomeUtils {
      *
      * @param newBiomeName the name of the custom biome to set (such as tardis:skaro_lakes)
      * @param location     the location to set the biome for
-     * @param refresh      whether to refresh the chunk after setting the biome
      */
     public static void setCustomBiome(String newBiomeName, Location location) { setCustomBiome(newBiomeName, location, true); }
+    /**
+     * Set a location to a custom biome
+     * 
+     * @param newBiomeName the name of the custom biome to set
+     * @param x            the x coordinate of the location to set the biome for
+     * @param y            the y coordinate of the location to set the biome for
+     * @param z            the z coordinate of the location to set the biome for
+     * @param world        the world of the location to set the biome for
+     * @param refresh      whether to refresh the chunk after setting the biome
+     */
     public static void setCustomBiome(String newBiomeName, int x, int y, int z, World world, boolean refresh) {
         setCustomBiome(newBiomeName, new Location(world, x, y, z), refresh);
     }
+    /**
+     * Set a location to a custom biome
+     * It refresh the chunk after setting the biome.
+     * 
+     * @param newBiomeName the name of the custom biome to set
+     * @param x            the x coordinate of the location to set the biome for
+     * @param y            the y coordinate of the location to set the biome for
+     * @param z            the z coordinate of the location to set the biome for
+     * @param world        the world of the location to set the biome for
+     */
     public static void setCustomBiome(String newBiomeName, int x, int y, int z, World world) {
         setCustomBiome(newBiomeName, x, y, z, world, true);
     }
@@ -234,6 +253,14 @@ public class NMSBiomeUtils {
         }
     }
 
+    /**
+     * Normalize the biome name to the format minecraft:biome_name
+     * Any bukkit biome name will be converted to minecraft biome name.
+     * e.g. "minecraft:plains" or "PLAINS" will be returned as "minecraft:plains"
+     * 
+     * @param name the name of the biome
+     * @return a normalized biome name
+     */
     public static @Nonnull String normalizeBiomeName(@Nonnull String name) {
         name = name.toLowerCase();
         if (!name.contains(":")) {
@@ -241,6 +268,14 @@ public class NMSBiomeUtils {
         }
         return name;
     }
+    /**
+     * Normalize the biome name to the format minecraft:biome_name
+     * Any bukkit biome name will be converted to minecraft biome name.
+     * e.g. "minecraft:plains" or "PLAINS" will be returned as "minecraft:plains"
+     * 
+     * @param nameList a list of biome names
+     * @return a list of normalized biome names
+     */
     public static @Nonnull List<String> normalizeBiomeNameList(@Nonnull List<String> nameList) {
         return nameList.stream().map(NMSBiomeUtils::normalizeBiomeName).toList();
     }
