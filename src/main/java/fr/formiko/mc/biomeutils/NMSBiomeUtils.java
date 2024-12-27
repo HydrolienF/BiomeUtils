@@ -1,6 +1,7 @@
 package fr.formiko.mc.biomeutils;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -28,12 +29,17 @@ public class NMSBiomeUtils {
 
     @Nonnull
     public static Registry<Biome> getBiomeRegistry() {
-        return ((CraftServer) Bukkit.getServer()).getServer().registryAccess().registryOrThrow(Registries.BIOME);
+        return ((CraftServer) Bukkit.getServer()).getServer().registryAccess().lookupOrThrow(Registries.BIOME);
     }
 
     /** Return the biome from it's key */
     @Nullable
-    public static Biome getBiome(String key) { return getBiomeRegistry().get(resourceLocation(key)); }
+    public static Biome getBiome(String key) {
+        Holder.Reference<Biome> ref = getBiomeRegistry().get(resourceLocation(key)).orElse(null);
+        if (ref == null)
+            return null;
+        return ref.value();
+    }
     /**
      * Return the real biome at the given location. (Not the noise biome)
      */
@@ -41,16 +47,25 @@ public class NMSBiomeUtils {
     public static Biome getBiome(Location location) {
         return getBiome(location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld());
     }
+    @Nullable
+    public static Holder<Biome> getBiomeHolder(Location location) {
+        return getBiomeHolder(location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld());
+    }
 
     /**
      * Return the real biome at the given location. (Not the noise biome)
      */
     @Nullable
     public static Biome getBiome(int x, int y, int z, World bukkitWorld) {
+        Holder<Biome> biomeHolder = getBiomeHolder(x, y, z, bukkitWorld);
+        return biomeHolder == null ? null : biomeHolder.value();
+    }
+    @Nullable
+    public static Holder<Biome> getBiomeHolder(int x, int y, int z, World bukkitWorld) {
         if (bukkitWorld == null)
             return null;
         ServerLevel nmsWorld = ((CraftWorld) bukkitWorld).getHandle();
-        return nmsWorld.getNoiseBiome(x >> 2, y >> 2, z >> 2).value();
+        return nmsWorld.getNoiseBiome(x >> 2, y >> 2, z >> 2);
     }
 
     @Nullable
@@ -105,17 +120,29 @@ public class NMSBiomeUtils {
             return false;
 
         return getBiomeRegistry().getTags()
-                .anyMatch(pair -> pair.getFirst().location().toString().equals(tagString) && pair.getSecond().contains(biomeHolder));
+                .anyMatch(pair -> pair.key().location().toString().equals(tagString) && pair.contains(biomeHolder));
     }
+    /**
+     * Return true if the biome match the tag.
+     * It will always be false if an argument is null or if the biome or tag doesn't exist.
+     */
+    public static boolean matchTag(Location location, String tagString) { return matchTag(getBiomeKeyString(location), tagString); }
+    /**
+     * Return true if the biome match the tag.
+     * It will always be false if an argument is null or if the biome or tag doesn't exist.
+     */
+    public static boolean matchTag(org.bukkit.block.Block block, String tagString) { return matchTag(block.getLocation(), tagString); }
+
+
     @Nullable
-    public static ResourceKey<Biome> getBiomeResourceKey(String key) {
+    public static ResourceKey<Biome> getBiomeResourceKey(@Nonnull String key) {
         Biome biome = getBiome(key);
         if (biome == null)
             return null;
         return getBiomeRegistry().getResourceKey(biome).get();
     }
     @Nullable
-    public static Holder<Biome> getBiomeHolder(String key) { return getBiomeRegistry().getHolder(resourceLocation(key)).orElse(null); }
+    public static Holder<Biome> getBiomeHolder(String key) { return getBiomeRegistry().get(resourceLocation(key)).orElse(null); }
 
     @Nonnull
     public static Map<String, Biome> getAllBiomes() {
@@ -124,6 +151,10 @@ public class NMSBiomeUtils {
             allBiomes = biomeRegistry.stream().collect(Collectors.toMap(biome -> biomeRegistry.getKey(biome).toString(), biome -> biome));
         }
         return allBiomes;
+    }
+    @Nonnull
+    public static Set<String> getAllBiomesKeyStringMatchingTag(String tag) {
+        return getAllBiomes().keySet().stream().filter(biomeKey -> matchTag(biomeKey, tag)).collect(Collectors.toSet());
     }
 
     /**

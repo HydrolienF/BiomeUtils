@@ -24,14 +24,15 @@ This project is inspired by :
 // At least for now it's working
 ```sh
 ./gradlew clean publish
-gpg -ab build/staging-deploy/fr/formiko/mc/biomeutils/biomeutils/1.1.2/biomeutils-1.1.2.jar
-gpg -ab build/staging-deploy/fr/formiko/mc/biomeutils/biomeutils/1.1.2/biomeutils-1.1.2-javadoc.jar
-gpg -ab build/staging-deploy/fr/formiko/mc/biomeutils/biomeutils/1.1.2/biomeutils-1.1.2-sources.jar
-gpg -ab build/staging-deploy/fr/formiko/mc/biomeutils/biomeutils/1.1.2/biomeutils-1.1.2.pom
-gpg -ab build/staging-deploy/fr/formiko/mc/biomeutils/biomeutils/1.1.2/biomeutils-1.1.2.module
-gpg -ab build/staging-deploy/fr/formiko/mc/biomeutils/biomeutils/1.1.2/biomeutils-1.1.2-dev.jar
+export version="1.1.7"
+gpg -ab build/staging-deploy/fr/formiko/mc/biomeutils/biomeutils/${version}/biomeutils-${version}.jar
+gpg -ab build/staging-deploy/fr/formiko/mc/biomeutils/biomeutils/${version}/biomeutils-${version}-javadoc.jar
+gpg -ab build/staging-deploy/fr/formiko/mc/biomeutils/biomeutils/${version}/biomeutils-${version}-sources.jar
+gpg -ab build/staging-deploy/fr/formiko/mc/biomeutils/biomeutils/${version}/biomeutils-${version}.pom
+gpg -ab build/staging-deploy/fr/formiko/mc/biomeutils/biomeutils/${version}/biomeutils-${version}.module
+# gpg -ab build/staging-deploy/fr/formiko/mc/biomeutils/biomeutils/${version}/biomeutils-${version}-dev.jar
 cd build/staging-deploy/
-zip -r staging-deploy-1.1.2.zip fr
+zip -r staging-deploy-${version}.zip fr
 cd ../..
 ```
 Then publish the .zip file [there](https://central.sonatype.com/publishing)

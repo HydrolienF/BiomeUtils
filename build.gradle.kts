@@ -2,13 +2,13 @@
 
 plugins {
     `java-library`
-    id("io.papermc.paperweight.userdev") version "1.7.3" // paperweight // Check for new versions at https://plugins.gradle.org/plugin/io.papermc.paperweight.userdev
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.8" // paperweight // Check for new versions at https://plugins.gradle.org/plugin/io.papermc.paperweight.userdev
     `maven-publish` // Add ./gradlew publishToMavenLocal
     signing // Add ./gradlew signArchives
 }
 
 group = "fr.formiko.mc.biomeutils"
-version = "1.1.2"
+version = "1.1.7"
 description="Tools for Minecraft plugins about biomes."
 // name = "BiomeUtils"
 
@@ -20,7 +20,7 @@ repositories {
 
 
 dependencies {
-    paperweight.paperDevBundle("1.21.1-R0.1-SNAPSHOT") // paperweight
+    paperweight.paperDevBundle("1.21.3-R0.1-SNAPSHOT") // paperweight
 }
 
 java {
@@ -33,10 +33,15 @@ java {
 tasks {
     assemble {
         // dependsOn(shadowJar) // Not needed, probably because reobfJar depends on shadowJar
-        dependsOn(reobfJar)
+        // dependsOn(reobfJar)
     }
     publish {
-        dependsOn(reobfJar)
+        // dependsOn(reobfJar)
+    }
+    jar {
+      manifest {
+        attributes["paperweight-mappings-namespace"] = "mojang"
+      }
     }
 }
 
@@ -46,17 +51,17 @@ afterEvaluate {
     }
 }
 
-fun addReobfTo(target: NamedDomainObjectProvider<Configuration>, classifier: String? = null) {
-    target.get().let {
-        it.outgoing.artifact(tasks.reobfJar.get().outputJar) {
-            this.classifier = classifier
-        }
-        (components["java"] as AdhocComponentWithVariants).addVariantsFromConfiguration(it) {}
-    }
-}
+// fun addReobfTo(target: NamedDomainObjectProvider<Configuration>, classifier: String? = null) {
+//     target.get().let {
+//         it.outgoing.artifact(tasks.reobfJar.get().outputJar) {
+//             this.classifier = classifier
+//         }
+//         (components["java"] as AdhocComponentWithVariants).addVariantsFromConfiguration(it) {}
+//     }
+// }
 
-addReobfTo(configurations.apiElements)
-addReobfTo(configurations.runtimeElements)
+// addReobfTo(configurations.apiElements)
+// addReobfTo(configurations.runtimeElements)
 
 publishing {
   publications {
