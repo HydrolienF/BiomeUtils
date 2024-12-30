@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "fr.formiko.mc.biomeutils"
-version = "1.1.8"
+version = "1.1.10"
 description="Tools for Minecraft plugins about biomes."
 // name = "BiomeUtils"
 
@@ -30,14 +30,7 @@ java {
     withSourcesJar()
 }
 
-tasks {
   // Don't make assemble or publish depend on reobfJar We don't want to reobfuscate the jar here. It will be done later by the plugin using this dependency.
-    jar {
-      manifest {
-        attributes["paperweight-mappings-namespace"] = "mojang"
-      }
-    }
-}
 
 afterEvaluate {
     tasks.withType(PublishToMavenRepository::class.java) {
@@ -49,22 +42,17 @@ publishing {
   publications {
     create<MavenPublication>("mavenJava") {
       from(components["java"])
-      // artifact(tasks["sourcesJar"])
 
-
-      // TODO exclude the -dev jar
       artifactId = project.name.lowercase()
-    // }
-    // withType<MavenPublication> {
       pom {
         packaging = "jar"
-        url.set("https://github.com/HydrolienF/BiomeUtils")
+        url.set("https://github.com/HydrolienF/${project.name}")
         inceptionYear.set("2024")
         description = project.description
         licenses {
           license {
             name.set("MIT license")
-            url.set("https://github.com/HydrolienF/BiomeUtils/blob/master/LICENSE.md")
+            url.set("https://github.com/HydrolienF/${project.name}/blob/master/LICENSE.md")
           }
         }
         developers {
@@ -75,17 +63,17 @@ publishing {
           }
         }
         scm {
-          connection.set("scm:git:git@github.com:HydrolienF/BiomeUtils.git")
-          developerConnection.set("scm:git:ssh:git@github.com:HydrolienF/BiomeUtils.git")
-          url.set("https://github.com/HydrolienF/BiomeUtils")
+          connection.set("scm:git:git@github.com:HydrolienF/${project.name}.git")
+          developerConnection.set("scm:git:ssh:git@github.com:HydrolienF/${project.name}.git")
+          url.set("https://github.com/HydrolienF/${project.name}")
         }
       }
     }
   }
   repositories {
     maven {
-        // url = layout.buildDirectory.dir("build/libs/").get().asFile.toURI()
         url = layout.buildDirectory.dir("staging-deploy").get().asFile.toURI()
+
     }
   }
 }

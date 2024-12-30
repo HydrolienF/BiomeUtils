@@ -1,4 +1,7 @@
 # BiomeUtils
+
+[Maven](https://central.sonatype.com/artifact/fr.formiko.mc.biomeutils/biomeutils)
+
 Tools for Minecraft plugins about biomes.
 
 # Use
@@ -24,13 +27,6 @@ This project is inspired by :
 // At least for now it's working
 ```sh
 ./gradlew clean publish
-export version="1.1.7"
-gpg -ab build/staging-deploy/fr/formiko/mc/biomeutils/biomeutils/${version}/biomeutils-${version}.jar
-gpg -ab build/staging-deploy/fr/formiko/mc/biomeutils/biomeutils/${version}/biomeutils-${version}-javadoc.jar
-gpg -ab build/staging-deploy/fr/formiko/mc/biomeutils/biomeutils/${version}/biomeutils-${version}-sources.jar
-gpg -ab build/staging-deploy/fr/formiko/mc/biomeutils/biomeutils/${version}/biomeutils-${version}.pom
-gpg -ab build/staging-deploy/fr/formiko/mc/biomeutils/biomeutils/${version}/biomeutils-${version}.module
-# gpg -ab build/staging-deploy/fr/formiko/mc/biomeutils/biomeutils/${version}/biomeutils-${version}-dev.jar
 cd build/staging-deploy/
 zip -r staging-deploy-${version}.zip fr
 cd ../..
