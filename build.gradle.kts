@@ -77,3 +77,10 @@ publishing {
     }
   }
 }
+
+tasks.register<Zip>("zipStagingDeploy") {
+    dependsOn("publishMavenJavaPublicationToMavenRepository")
+    from(layout.buildDirectory.dir("staging-deploy"))
+    archiveFileName.set("staging-deploy-${project.version}.zip")
+    destinationDirectory.set(layout.buildDirectory)
+}
