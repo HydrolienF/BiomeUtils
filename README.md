@@ -1,7 +1,4 @@
 # BiomeUtils
-
-[Maven](https://central.sonatype.com/artifact/fr.formiko.mc.biomeutils/biomeutils)
-
 Tools for Minecraft plugins about biomes.
 
 # Use
@@ -26,9 +23,6 @@ This project is inspired by :
 // TODO instead of command line, it will be able to use gradle onces I figure out how to sign all the files & push to maven central.
 // At least for now it's working
 ```sh
-./gradlew clean publish
-cd build/staging-deploy/
-zip -r staging-deploy-${version}.zip fr
-cd ../..
+./gradlew clean zipStagingDeploy
 ```
 Then publish the .zip file [there](https://central.sonatype.com/publishing)

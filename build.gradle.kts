@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "fr.formiko.mc.biomeutils"
-version = "1.1.10"
+version = "1.1.11"
 description="Tools for Minecraft plugins about biomes."
 // name = "BiomeUtils"
 
@@ -78,9 +78,29 @@ publishing {
   }
 }
 
+// Custom signing task using gpg -ab
+val signWithGpg = tasks.register("signWithGpg") {
+    dependsOn("publishMavenJavaPublicationToMavenRepository")
+    group = "signing"
+    description = "Sign the publication using gpg -ab"
+    val filesToSign = fileTree("${buildDir}/staging-deploy/${project.group.toString().lowercase().replace('.', '/')}/${project.name.lowercase()}/${project.version}") {
+        include("**/*.jar", "**/*.module", "**/*.pom")
+    }
+    doFirst {
+        filesToSign.forEach { file ->
+            val command = listOf("gpg", "-ab", "--output", "${file.absolutePath}.asc", file.absolutePath)
+            println("Executing command: ${command.joinToString(" ")}")
+            exec {
+                commandLine = command
+            }
+        }
+    }
+}
+
 tasks.register<Zip>("zipStagingDeploy") {
+    dependsOn("signWithGpg")
     dependsOn("publishMavenJavaPublicationToMavenRepository")
     from(layout.buildDirectory.dir("staging-deploy"))
-    archiveFileName.set("staging-deploy-${project.version}.zip")
+    archiveFileName.set("staging-deploy-${project.name}-${project.version}.zip")
     destinationDirectory.set(layout.buildDirectory)
 }
