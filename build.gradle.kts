@@ -78,23 +78,28 @@ publishing {
   }
 }
 
-// Custom signing task using gpg -ab
-val signWithGpg = tasks.register("signWithGpg") {
-    dependsOn("publishMavenJavaPublicationToMavenRepository")
-    group = "signing"
-    description = "Sign the publication using gpg -ab"
-    val filesToSign = fileTree("${buildDir}/staging-deploy/${project.group.toString().lowercase().replace('.', '/')}/${project.name.lowercase()}/${project.version}") {
-        include("**/*.jar", "**/*.module", "**/*.pom")
-    }
-    doFirst {
-        filesToSign.forEach { file ->
-            val command = listOf("gpg", "-ab", "--output", "${file.absolutePath}.asc", file.absolutePath)
-            println("Executing command: ${command.joinToString(" ")}")
-            exec {
-                commandLine = command
-            }
-        }
-    }
+// // Custom signing task using gpg -ab
+// val signWithGpg = tasks.register("signWithGpg") {
+//     dependsOn("publishMavenJavaPublicationToMavenRepository")
+//     group = "signing"
+//     description = "Sign the publication using gpg -ab"
+//     val filesToSign = fileTree("${buildDir}/staging-deploy/${project.group.toString().lowercase().replace('.', '/')}/${project.name.lowercase()}/${project.version}") {
+//         include("**/*.jar", "**/*.module", "**/*.pom")
+//     }
+//     doFirst {
+//         filesToSign.forEach { file ->
+//             val command = listOf("gpg", "-ab", "--output", "${file.absolutePath}.asc", file.absolutePath)
+//             println("Executing command: ${command.joinToString(" ")}")
+//             exec {
+//                 commandLine = command
+//             }
+//         }
+//     }
+// }
+
+signing {
+    // Signs the Maven publication
+    sign(publishing.publications["mavenJava"])
 }
 
 tasks.register<Zip>("zipStagingDeploy") {
