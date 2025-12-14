@@ -1,14 +1,17 @@
-// import org.jreleaser.model.Active
+import org.jreleaser.model.Active
+import org.jreleaser.model.Signing
 
 plugins {
     `java-library`
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.8" // paperweight // Check for new versions at https://plugins.gradle.org/plugin/io.papermc.paperweight.userdev
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.19" // paperweight // Check for new versions at https://plugins.gradle.org/plugin/io.papermc.paperweight.userdev
+    // id("com.vanniktech.maven.publish") version "0.35.0"
     `maven-publish` // Add ./gradlew publishToMavenLocal
     signing // Add ./gradlew signArchives
+    id("org.jreleaser") version "1.15.0"
 }
 
 group = "fr.formiko.mc.biomeutils"
-version = "1.1.11"
+version = "1.1.13"
 description="Tools for Minecraft plugins about biomes."
 // name = "BiomeUtils"
 
@@ -20,7 +23,7 @@ repositories {
 
 
 dependencies {
-    paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT") // paperweight
+    paperweight.paperDevBundle("1.21.8-R0.1-SNAPSHOT") // paperweight
 }
 
 java {
@@ -32,11 +35,6 @@ java {
 
   // Don't make assemble or publish depend on reobfJar We don't want to reobfuscate the jar here. It will be done later by the plugin using this dependency.
 
-afterEvaluate {
-    tasks.withType(PublishToMavenRepository::class.java) {
-        dependsOn(tasks.assemble)
-    }
-}
 
 publishing {
   publications {
@@ -45,6 +43,7 @@ publishing {
 
       artifactId = project.name.lowercase()
       pom {
+        name.set(project.name.lowercase())
         packaging = "jar"
         url.set("https://github.com/HydrolienF/${project.name}")
         inceptionYear.set("2024")
@@ -72,40 +71,115 @@ publishing {
   }
   repositories {
     maven {
-        url = layout.buildDirectory.dir("staging-deploy").get().asFile.toURI()
-
-    }
+            name = "PreDeploy"
+            url = uri(layout.buildDirectory.dir("pre-deploy"))
+        }
   }
 }
 
-// // Custom signing task using gpg -ab
-// val signWithGpg = tasks.register("signWithGpg") {
-//     dependsOn("publishMavenJavaPublicationToMavenRepository")
-//     group = "signing"
-//     description = "Sign the publication using gpg -ab"
-//     val filesToSign = fileTree("${buildDir}/staging-deploy/${project.group.toString().lowercase().replace('.', '/')}/${project.name.lowercase()}/${project.version}") {
-//         include("**/*.jar", "**/*.module", "**/*.pom")
-//     }
-//     doFirst {
-//         filesToSign.forEach { file ->
-//             val command = listOf("gpg", "-ab", "--output", "${file.absolutePath}.asc", file.absolutePath)
-//             println("Executing command: ${command.joinToString(" ")}")
-//             exec {
-//                 commandLine = command
-//             }
-//         }
-//     }
-// }
+
+jreleaser {
+    project {
+        name.set("biomeutils")
+        copyright.set("Hydrolien")
+        description.set(findProperty("description")?.toString() ?: "Default description")
+        website.set("https://github.com/HydrolienF/${project.name}")
+    }
+
+    // Not working, we use signing task instead.
+    // signing {
+    //     active.set(Active.ALWAYS)
+    //     armored.set(true)
+    //     verify.set(false)
+    //     mode.set(Signing.Mode.FILE)
+    //     publicKey.set("C:/Users/x/.jreleaser/public.key")
+    //     secretKey.set("C:/Users/x/.jreleaser/private.key")
+    //     passphrase.set(
+    //         findProperty("gpgPassphrase")?.toString()
+    //             ?: System.getenv("JRELEASER_GPG_PASSPHRASE")
+    //     )
+    // }
+
+    deploy {
+        maven {
+            mavenCentral {
+                create("sonatype") {
+                    active.set(Active.ALWAYS)
+                    url.set("https://central.sonatype.com/api/v1/publisher")
+                    username.set(findProperty("ossrhUsername")?.toString()
+                        ?: System.getenv("OSSRH_USERNAME"))
+                    password.set(findProperty("ossrhPassword")?.toString()
+                        ?: System.getenv("OSSRH_PASSWORD"))
+                    stagingRepository("build/pre-deploy")  // call as function
+
+                    applyMavenCentralRules = false
+                }
+            }
+        }
+    }
+
+    release {
+        github {
+            enabled.set(false)
+        }
+    }
+}
 
 signing {
-    // Signs the Maven publication
+    useGpgCmd() // uses local gpg executable
     sign(publishing.publications["mavenJava"])
 }
 
-tasks.register<Zip>("zipStagingDeploy") {
-    dependsOn("signWithGpg")
-    dependsOn("publishMavenJavaPublicationToMavenRepository")
-    from(layout.buildDirectory.dir("staging-deploy"))
-    archiveFileName.set("staging-deploy-${project.name}-${project.version}.zip")
-    destinationDirectory.set(layout.buildDirectory)
+tasks.register("signArtifacts") {
+    dependsOn(tasks.withType<Sign>())
 }
+
+
+// afterEvaluate {
+//     tasks.withType(PublishToMavenRepository::class.java) {
+//         dependsOn(tasks.assemble)
+//     }
+// }
+
+// com.vanniktech.maven.publish never worked because of an endless loop with paper & vanniktech editing plainJavadocJar task.
+// mavenPublishing {
+//     coordinates(
+//         groupId =  project.group.toString(),
+//         artifactId = project.name.lowercase(),
+//         version = project.version.toString()
+//     )
+
+//     pom {
+//         name.set("${project.name}")
+//         description.set(project.description)
+//         inceptionYear.set("2024")
+//         url.set("https://github.com/HydrolienF/${project.name}")
+
+//         licenses {
+//             license {
+//                 name.set("MIT license")
+//                 url.set("https://github.com/HydrolienF/${project.name}/blob/master/LICENSE.md")
+//             }
+//         }
+
+//         developers {
+//           developer {
+//             id.set("hydrolienf")
+//             name.set("HydrolienF")
+//             email.set("hydrolien.f@gmail.com")
+//           }
+//         }
+
+//         scm {
+//             connection.set("scm:git:git@github.com:HydrolienF/${project.name}.git")
+//             developerConnection.set("scm:git:ssh:git@github.com:HydrolienF/${project.name}.git")
+//             url.set("https://github.com/HydrolienF/${project.name}")
+//         }
+//     }
+
+//     // Configure publishing to Maven Central
+//     publishToMavenCentral()
+
+//     // Enable GPG signing for all publications
+//     signAllPublications()
+// }

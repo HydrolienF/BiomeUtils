@@ -23,9 +23,8 @@ This project is inspired by :
 
 
 # Assemble, publish, sign & zip.
-// TODO instead of command line, it will be able to use gradle onces I figure out how to sign all the files & push to maven central.
-// At least for now it's working
 ```sh
-./gradlew clean zipStagingDeploy
+./gradlew clean publish
+./gradlew jreleaserDeploy
 ```
-Then publish the .zip file [there](https://central.sonatype.com/publishing)
+The published lib will be available [there](https://central.sonatype.com/publishing).
