@@ -25,6 +25,6 @@ This project is inspired by :
 # Assemble, publish, sign & zip.
 ```sh
 ./gradlew clean publish
-./gradlew jreleaserDeploy
+./gradlew jreleaserDeploy # need to be done in a 2nd time so that the directory exists.
 ```
 The published lib will be available [there](https://central.sonatype.com/publishing).
