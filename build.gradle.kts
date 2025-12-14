@@ -80,7 +80,7 @@ publishing {
 
 jreleaser {
     project {
-        name.set("biomeutils")
+        name.set("${project.name}")
         copyright.set("Hydrolien")
         description.set(findProperty("description")?.toString() ?: "Default description")
         website.set("https://github.com/HydrolienF/${project.name}")
