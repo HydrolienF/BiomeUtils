@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "fr.formiko.mc.biomeutils"
-version = "1.1.13"
+version = "1.1.14"
 description="Tools for Minecraft plugins about biomes."
 // name = "BiomeUtils"
 
@@ -23,7 +23,7 @@ repositories {
 
 
 dependencies {
-    paperweight.paperDevBundle("1.21.8-R0.1-SNAPSHOT") // paperweight
+    paperweight.paperDevBundle("1.21.11-R0.1-SNAPSHOT") // paperweight
 }
 
 java {

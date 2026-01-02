@@ -6,6 +6,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.chunk.ChunkAccess;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -13,16 +23,6 @@ import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CraftBiome;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.chunk.ChunkAccess;
 
 /**
  * Tool class to manipulate nms biomes.
@@ -72,36 +72,35 @@ public class NMSBiomeUtils {
     }
 
     @Nullable
-    public static ResourceLocation getBiomeKey(@Nonnull Location location) {
+    public static Identifier getBiomeKey(@Nonnull Location location) {
         Biome biome = getBiome(location);
         return getBiomeRegistry().getKey(biome);
     }
     @Nullable
-    public static ResourceLocation getBiomeKey(int x, int y, int z, @Nonnull World bukkitWorld) {
+    public static Identifier getBiomeKey(int x, int y, int z, @Nonnull World bukkitWorld) {
         Biome biome = getBiome(x, y, z, bukkitWorld);
         return getBiomeRegistry().getKey(biome);
     }
     @Nullable
     public static String getBiomeKeyString(Location location) {
-        ResourceLocation key = getBiomeKey(location);
+        Identifier key = getBiomeKey(location);
         return key == null ? null : key.toString();
     }
     @Nullable
     public static String getBiomeKeyString(int x, int y, int z, World bukkitWorld) {
-        ResourceLocation key = getBiomeKey(x, y, z, bukkitWorld);
+        Identifier key = getBiomeKey(x, y, z, bukkitWorld);
         return key == null ? null : key.toString();
     }
     @Nonnull
-    public static ResourceLocation resourceLocation(@Nonnull String name) {
+    public static Identifier resourceLocation(@Nonnull String name) {
         String[] t = name.split(":");
-        return ResourceLocation.fromNamespaceAndPath(t[0], t[1]);
+        return Identifier.fromNamespaceAndPath(t[0], t[1]);
     }
 
     // Convert between Minecraft and Bukkit biomes
     // minecraft to bukkit don't work with custom biomes.
-    public static org.bukkit.block.Biome minecraftToBukkit(Biome minecraft) { return CraftBiome.minecraftToBukkit(minecraft); }
-    public static Biome bukkitToMinecraft(org.bukkit.block.Biome bukkit) { return CraftBiome.bukkitToMinecraft(bukkit); }
-    public static org.bukkit.block.Biome minecraftHolderToBukkit(Holder<Biome> minecraft) { return minecraftToBukkit(minecraft.value()); }
+    public static Biome bukkitToMinecraft(org.bukkit.block.Biome bukkit) { return CraftBiome.bukkitToMinecraftHolder(bukkit).value(); }
+    public static org.bukkit.block.Biome minecraftHolderToBukkit(Holder<Biome> minecraft) { return CraftBiome.minecraftHolderToBukkit(minecraft); }
     public static Holder<Biome> bukkitToMinecraftHolder(org.bukkit.block.Biome bukkit) {
         return CraftBiome.bukkitToMinecraftHolder(bukkit);
     }
