@@ -2,7 +2,7 @@
 Tools for Minecraft plugins about biomes.
 
 # Use
-Use this library in a Gradle kts project with: (replace 1.1.8 with the last version from the release tab.)
+Use this library in a Gradle kts project with: (replace 1.1.14 with the last version from the release tab.)
 
 ```kt
 repositories {
@@ -11,7 +11,7 @@ repositories {
 ```
 ```kt
 dependencies {
-    implementation("fr.formiko.mc.biomeutils:biomeutils:1.1.8")
+    implementation("fr.formiko.mc.biomeutils:biomeutils:1.1.14")
 }
 ```
 
