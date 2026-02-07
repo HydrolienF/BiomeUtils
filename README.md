@@ -28,3 +28,6 @@ This project is inspired by :
 ./gradlew jreleaserDeploy # need to be done in a 2nd time so that the directory exists.
 ```
 The published lib will be available [there](https://central.sonatype.com/publishing).
+
+Publish to maven central with Github action does not work for now because of `Process 'command 'gpg'' finished with non-zero exit value 2`
+It might be because gpg is not installed by default on Github action or because I forgot to setup the key.
