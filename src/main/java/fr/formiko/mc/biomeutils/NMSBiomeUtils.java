@@ -1,11 +1,15 @@
 package fr.formiko.mc.biomeutils;
 
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import net.kyori.adventure.key.Key;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -100,7 +104,9 @@ public class NMSBiomeUtils {
     // Convert between Minecraft and Bukkit biomes
     // minecraft to bukkit don't work with custom biomes.
     public static Biome bukkitToMinecraft(org.bukkit.block.Biome bukkit) { return CraftBiome.bukkitToMinecraftHolder(bukkit).value(); }
-    public static org.bukkit.block.Biome minecraftHolderToBukkit(Holder<Biome> minecraft) { return CraftBiome.minecraftHolderToBukkit(minecraft); }
+    public static org.bukkit.block.Biome minecraftHolderToBukkit(Holder<Biome> minecraft) {
+        return CraftBiome.minecraftHolderToBukkit(minecraft);
+    }
     public static Holder<Biome> bukkitToMinecraftHolder(org.bukkit.block.Biome bukkit) {
         return CraftBiome.bukkitToMinecraftHolder(bukkit);
     }
@@ -139,7 +145,7 @@ public class NMSBiomeUtils {
         return getBiomeRegistry().getResourceKey(biome).orElse(null);
     }
     @Nullable
-    public static Holder<Biome> getBiomeHolder(String key) { return getBiomeRegistry().get(resourceLocation(key)).orElse(null); }
+    public static Holder<Biome> getBiomeHolder(@Nonnull String key) { return getBiomeRegistry().get(resourceLocation(key)).orElse(null); }
 
     @Nonnull
     public static Map<String, Biome> getAllBiomes() {
@@ -239,15 +245,22 @@ public class NMSBiomeUtils {
         if (w.isLoaded(pos)) {
             ChunkAccess chunk = w.getChunk(pos);
             if (chunk != null) {
-                chunk.setBiome(x >> 2, y >> 2, z >> 2, bb);
+                chunk.setNoiseBiome(x >> 2, y >> 2, z >> 2, bb);
             }
         }
     }
 
     public static @Nullable org.bukkit.block.Biome getBukkitBiome(String name) {
+        Key key;
+        if (name.contains(":")) {
+            String[] split = name.split(":");
+            key = Key.key(split[0], split[1]);
+        } else {
+            key = Key.key(Key.MINECRAFT_NAMESPACE, name);
+        }
         try {
-            return org.bukkit.block.Biome.valueOf(name.split(":")[1].toUpperCase());
-        } catch (IllegalArgumentException e) {
+            return RegistryAccess.registryAccess().getRegistry(RegistryKey.BIOME).getOrThrow(key);
+        } catch (NoSuchElementException e) {
             return null;
         }
     }

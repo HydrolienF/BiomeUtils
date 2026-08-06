@@ -3,7 +3,7 @@ import org.jreleaser.model.Signing
 
 plugins {
     `java-library`
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.19" // paperweight // Check for new versions at https://plugins.gradle.org/plugin/io.papermc.paperweight.userdev
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.21" // paperweight // Check for new versions at https://plugins.gradle.org/plugin/io.papermc.paperweight.userdev
     // id("com.vanniktech.maven.publish") version "0.35.0"
     `maven-publish` // Add ./gradlew publishToMavenLocal
     signing // Add ./gradlew signArchives
@@ -11,10 +11,10 @@ plugins {
 }
 
 group = "fr.formiko.mc.biomeutils"
-version = "1.1.14"
+version = "1.2.0"
 description="Tools for Minecraft plugins about biomes."
 // name = "BiomeUtils"
-var mainMinecraftVersion = "1.21.11"
+var mainMinecraftVersion = "26.2"
 val supportedMinecraftVersions = "$mainMinecraftVersion"
 
 repositories {
@@ -25,12 +25,12 @@ repositories {
 
 
 dependencies {
-    paperweight.paperDevBundle("$mainMinecraftVersion-R0.1-SNAPSHOT") // paperweight
+    paperweight.paperDevBundle("$mainMinecraftVersion.build.+") // paperweight
 }
 
 java {
     // Configure the java toolchain. This allows gradle to auto-provision JDK 21 on systems that only have JDK 8 installed for example.
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(25))
     withJavadocJar()
     withSourcesJar()
 }
