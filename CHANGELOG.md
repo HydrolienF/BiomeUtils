@@ -1,3 +1,7 @@
+# 1.3.0
+Suport 26.3
+Add tools for Bukkit/Paper API.
+
 # 1.2.0
 Suport 26.2
 

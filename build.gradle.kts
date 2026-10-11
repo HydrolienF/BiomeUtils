@@ -11,10 +11,10 @@ plugins {
 }
 
 group = "fr.formiko.mc.biomeutils"
-version = "1.2.0"
+version = "1.3.0"
 description="Tools for Minecraft plugins about biomes."
 // name = "BiomeUtils"
-var mainMinecraftVersion = "26.2"
+var mainMinecraftVersion = "26.3"
 val supportedMinecraftVersions = "$mainMinecraftVersion"
 
 repositories {
